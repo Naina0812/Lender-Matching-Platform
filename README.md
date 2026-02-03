@@ -95,6 +95,3 @@ This script creates sample lenders (Stearns, Apex, etc.) and runs test applicati
 Once the backend is running, visit:
 *   **Swagger UI**: `http://localhost:8000/docs`
 *   **ReDoc**: `http://localhost:8000/redoc`
-
-## 🧩 Key Design Decisions
-See [DECISIONS.md](./DECISIONS.md) for a deep dive into the architectural choices, including why we chose a relational database and how the dynamic policy engine works.
