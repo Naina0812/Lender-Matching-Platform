@@ -1,5 +1,6 @@
 import uuid
 from sqlalchemy import Column, Boolean, Integer, ForeignKey, DateTime, String, JSON
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.core.database import Base
 
@@ -14,3 +15,6 @@ class MatchResult(Base):
     fit_score = Column(Integer)
     rejection_reasons = Column(JSON)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    lender = relationship("Lender")
+    program = relationship("LenderProgram")

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app.core.database import SessionLocal
 from app.schemas.application import ApplicationCreate, ApplicationResponse
 from app.models.business import Business
@@ -23,14 +23,16 @@ def get_db():
         db.close()
 
 def _fetch_matches_for_loan_request(db: Session, loan_request_id: str) -> List[MatchResultResponse]:
-    db_matches = db.query(MatchResult).filter(MatchResult.loan_request_id == loan_request_id).all()
+    db_matches = db.query(MatchResult).options(
+        joinedload(MatchResult.lender),
+        joinedload(MatchResult.program)
+    ).filter(MatchResult.loan_request_id == loan_request_id).all()
+    
     matches = []
     for r in db_matches:
-        program = db.query(LenderProgram).filter(LenderProgram.id == r.program_id).first()
-        lender = db.query(Lender).filter(Lender.id == r.lender_id).first()
         matches.append(MatchResultResponse(
-            lender_name=lender.name if lender else "Unknown",
-            program_name=program.name if program else "Unknown",
+            lender_name=r.lender.name if r.lender else "Unknown",
+            program_name=r.program.name if r.program else "Unknown",
             eligible=r.eligible,
             fit_score=r.fit_score,
             rejection_reasons=r.rejection_reasons
@@ -64,14 +66,10 @@ def submit_application(app_data: ApplicationCreate, db: Session = Depends(get_db
     # 3. Format Response
     response = []
     for r in results:
-        lender_name = r.program_id # In real app, would join to get name. Simplification for now.
-        # Let's do a quick fetch for names to be nice
-        program = db.query(LenderProgram).filter(LenderProgram.id == r.program_id).first()
-        lender = db.query(Lender).filter(Lender.id == r.lender_id).first()
-        
+        # r.lender and r.program are already populated by MatchingEngine
         response.append(MatchResultResponse(
-            lender_name=lender.name if lender else "Unknown",
-            program_name=program.name if program else "Unknown",
+            lender_name=r.lender.name if r.lender else "Unknown",
+            program_name=r.program.name if r.program else "Unknown",
             eligible=r.eligible,
             fit_score=r.fit_score,
             rejection_reasons=r.rejection_reasons

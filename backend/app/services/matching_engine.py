@@ -21,8 +21,8 @@ class MatchingEngine:
                 # Save result to DB
                 db_match = MatchResult(
                     loan_request_id=loan_request_id,
-                    lender_id=lender.id,
-                    program_id=program.id,
+                    lender=lender,
+                    program=program,
                     eligible=result["eligible"],
                     fit_score=result["fit_score"],
                     rejection_reasons=result["rejection_reasons"]
