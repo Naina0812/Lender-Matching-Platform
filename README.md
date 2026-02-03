@@ -89,7 +89,6 @@ You can run the verification script to test the engine logic in isolation:
 ```bash
 python backend/seed_and_verify.py
 ```
-This script creates sample lenders (Stearns, Apex, etc.) and runs test applications to verify the matching algorithms are working correctly.
 
 ## 📖 API Documentation
 Once the backend is running, visit:
